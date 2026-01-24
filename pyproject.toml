@@ -43,3 +43,11 @@ pyside6 = ["PySide6"]
 
 [tool.setuptools.packages.find]
 include = ["pylint_qt*"]
+
+[tool.ruff]
+fix = true
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "RUF"]
