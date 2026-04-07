@@ -29,6 +29,10 @@ dependencies = [
     "pylint>=3.0,<5",
     "astroid>=3.0,<5",
 ]
+urls."Homepage" = "https://github.com/pylint-dev/pylint-qt"
+urls."Source Code" = "https://github.com/pylint-dev/pylint-qt"
+urls."Bug tracker" = "https://github.com/pylint-dev/pylint-qt/issues"
+urls."Changelog" = "https://github.com/pylint-dev/pylint-qt/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
