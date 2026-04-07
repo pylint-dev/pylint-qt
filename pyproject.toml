@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "pylint-qt"
 version = "0.1.0"
 description = "A Pylint plugin for improving Qt code analysis (PyQt5, PyQt6, PySide2, PySide6)"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.10"
 authors = [
     {name = "Emmanuel Ferdman", email = "emmanuelferdman@gmail.com"}
