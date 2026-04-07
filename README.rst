@@ -3,6 +3,13 @@ pylint-qt
 
 ``pylint-qt`` is a `Pylint <http://pylint.org>`__ plugin for improving code analysis when analysing code using Qt, supporting both PyQt and PySide.
 
+Installation
+------------
+
+.. code-block:: bash
+
+    pip install pylint-qt
+
 Usage
 -----
 
