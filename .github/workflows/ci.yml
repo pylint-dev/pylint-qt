@@ -67,3 +67,8 @@ jobs:
         uses: coactions/setup-xvfb@v1.0.1
         with:
           run: pytest tests/unit/ tests/integration/${{ matrix.qt-binding }}/ tests/test_functional.py --cov --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v6.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
