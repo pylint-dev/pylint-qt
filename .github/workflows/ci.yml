@@ -17,7 +17,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v7.0.0
       - uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.12"
@@ -45,7 +45,7 @@ jobs:
             qt-binding: "pyside2"
 
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v7.0.0
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6.2.0
