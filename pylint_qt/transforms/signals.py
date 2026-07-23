@@ -168,7 +168,73 @@ def _looks_like_subscripted_signal(node: nodes.Attribute) -> bool:
         return False
     if node.parent.value is not node:
         return False
-    return _get_qt_binding(node) is not None
+
+    # Don't intercept subscript assignment targets (e.g., obj.attr[i] = val).
+    # E1137 would be a false positive because the attribute is not a signal.
+    subscript = node.parent
+    if isinstance(subscript.parent, nodes.Assign) and subscript in subscript.parent.targets:
+        return False
+    if isinstance(subscript.parent, nodes.AugAssign) and subscript is subscript.parent.target:
+        return False
+
+    if _get_qt_binding(node) is None:
+        return False
+
+    # Verify the attribute actually resolves to a Qt signal by walking the MRO.
+    attrname = node.attrname
+    try:
+        for val in node.expr.infer():
+            if not isinstance(val, Instance):
+                continue
+            cls = val._proxied  # pylint: disable=protected-access
+            if not isinstance(cls, nodes.ClassDef):
+                continue
+            try:
+                mro = cls.mro()
+            except (NotImplementedError, TypeError):
+                mro = [cls]
+            for ancestor in mro:
+                if not isinstance(ancestor, nodes.ClassDef):
+                    continue
+                if attrname not in ancestor.locals:
+                    continue
+                for attr_node in ancestor.locals[attrname]:
+                    if not isinstance(attr_node, nodes.AssignName):
+                        continue
+                    parent = attr_node.parent
+                    if isinstance(parent, nodes.Assign):
+                        value_node = parent.value
+                    elif isinstance(parent, nodes.AnnAssign) and parent.value:
+                        value_node = parent.value
+                    else:
+                        continue
+                    try:
+                        for attr_val in value_node.infer():
+                            if isinstance(attr_val, Instance):
+                                # pylint: disable-next=protected-access
+                                if attr_val._proxied.qname() in _ALL_SIGNAL_QNAMES:
+                                    return True
+                    except InferenceError:
+                        pass
+    except InferenceError:
+        pass
+
+    # For signals from C++ bindings (e.g., QSpinBox.valueChanged), astroid
+    # represents them as FunctionDef nodes. Fall back to allowing any attribute
+    # from a Qt class that we couldn't resolve through locals.
+    try:
+        for val in node.expr.infer():
+            if not isinstance(val, Instance):
+                continue
+            cls = val._proxied  # pylint: disable=protected-access
+            if not isinstance(cls, nodes.ClassDef):
+                continue
+            if cls.qname().partition(".")[0] in _ALL_QT_ROOTS:
+                return True
+    except InferenceError:
+        pass
+
+    return False
 
 
 def _looks_like_signal_class_attribute(node: nodes.Attribute) -> bool:
